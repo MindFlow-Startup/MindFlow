@@ -23,7 +23,6 @@ export async function POST(request: Request) {
   try {
     const dados = await request.json();
 
-    // 👉 Formata o CRP pegando os dois primeiros dígitos como estado
     function formatCRP(input: string): string {
       const estadosMap: Record<string, string> = {
         "01": "SP",
@@ -38,9 +37,9 @@ export async function POST(request: Request) {
         "10": "PB",
       };
 
-      const limpo = input.replace("/", "").replace("-", "").trim(); // limpa barras e traços
-      const codigo = limpo.slice(0, 2); // primeiros dois dígitos
-      const numero = limpo.slice(2); // o resto é o número
+      const limpo = input.replace(/\D/g, ""); // remove tudo que não for número
+      const codigo = limpo.slice(0, 2);
+      const numero = limpo.slice(2);
       const estado = estadosMap[codigo] || "XX";
 
       return `${numero}-${estado}`;
@@ -50,10 +49,10 @@ export async function POST(request: Request) {
 
     const novo = {
       ...dados,
-      crp: crpFormatado,
+      crp: crpFormatado, // ⚠️ aqui está a troca real
     };
 
-    // 👉 (Opcional) salvar no banco:
+    // Se quiser salvar no banco, descomente:
     // const psicologoCriado = await prisma.psicologo.create({ data: novo });
 
     return new Response(JSON.stringify(novo), {
@@ -71,8 +70,6 @@ export async function POST(request: Request) {
     );
   }
 }
-
-  
 
 
 export async function PUT(request: Request) {
