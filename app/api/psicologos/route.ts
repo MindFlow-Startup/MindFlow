@@ -49,14 +49,15 @@ export async function POST(request: Request) {
 
     const novo = {
       ...dados,
-      crp: crpFormatado, // ⚠️ aqui está a troca real
+      crp: crpFormatado,
     };
 
-    // Se quiser salvar no banco, descomente:
-    // const psicologoCriado = await prisma.psicologo.create({ data: novo });
+    const psicologoCriado = await prisma.psicologo.create({
+      data: novo,
+    });
 
-    return new Response(JSON.stringify(novo), {
-      status: 200,
+    return new Response(JSON.stringify(psicologoCriado), {
+      status: 201,
       headers: {
         "Content-Type": "application/json",
       },
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
     );
   }
 }
+
 
 
 export async function PUT(request: Request) {
