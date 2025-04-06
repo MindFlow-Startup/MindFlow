@@ -89,8 +89,8 @@ export default function Home() {
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold flex items-center gap-2 transition-transform hover:scale-105">
-            <Image src={Logo || "/placeholder.svg"} alt="MindFlow Logo" width={120} height={120} className="ml-2" />
-            <span className="bg-gradient-to-r from-pink-500 to-purple-400 bg-clip-text text-transparent font-extrabold">
+            <Image src={Logo || "/placeholder.svg"} alt="MindFlow Logo" width={80} height={80} className="ml-2" />
+            <span className="bg-gradient-to-r from-rose-500 to-purple-800 bg-clip-text text-transparent font-extrabold">
               MindFlow
             </span>
           </Link>
@@ -119,7 +119,7 @@ export default function Home() {
           </button>
 
           {/* CTA Button */}
-          <button className="hidden md:block bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-pink-200 transform hover:-translate-y-1">
+          <button className="hidden md:block bg-gradient-to-r from-rose-500 to-purple-800 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-pink-200 transform hover:-translate-y-1">
             Experimente Grátis
           </button>
         </div>
@@ -153,7 +153,7 @@ export default function Home() {
         {/* Hero Section */}
         <section
           id="inicio"
-          className="pt-24 pb-20 bg-gradient-to-r from-pink-500 via-pink-400 to-purple-400 text-white overflow-hidden relative"
+          className="pt-24 pb-20 bg-gradient-to-r from-pink-400 via-pink-300 to-purple-300 text-white overflow-hidden relative"
         >
           {/* Background Elements */}
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -173,7 +173,7 @@ export default function Home() {
 
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center relative z-10">
             <div className="md:w-1/2 mb-12 md:mb-0 animate-fadeIn">
-              <div className="inline-block px-3 py-1 bg-pink-600/30 rounded-full text-pink-100 font-medium text-sm mb-6 border border-pink-400/50 backdrop-blur-sm">
+              <div className="inline-block px-3 py-1 bg-blue-600/60 rounded-full text-white font-medium text-sm mb-6 border border-pink-400/50 backdrop-blur-sm">
                 <span className="flex items-center">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Plataforma para Psicólogos
@@ -190,7 +190,7 @@ export default function Home() {
                 psicólogos.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="psicologos/login">
+                <Link href="psicologos/cadastro">
                   <button className="bg-gradient-to-r from-blue-400 to-pink-400 hover:from-blue-600 hover:to-pink-500 text-white font-bold py-3.5 px-8 rounded-full text-lg transition-all duration-300 hover:shadow-lg hover:shadow-pink-400/30 transform hover:-translate-y-1 flex items-center justify-center group">
                     Comece Agora
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -234,7 +234,7 @@ export default function Home() {
                   className="rounded-xl shadow-inner"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-gradient-to-r from-pink-300 to-pink-400 rounded-2xl p-4 shadow-xl transform rotate-3 z-20 border border-pink-200 backdrop-blur-sm">
+              <div className="absolute -bottom-6 -right-6 bg-gradient-to-r bg-blue-600/60  text-white rounded-2xl p-4 shadow-xl transform rotate-3 z-20 border border-pink-200 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <Heart className="h-8 w-8 text-white" />
                   <div>
@@ -873,7 +873,7 @@ export default function Home() {
           </div>
 
           <div className=" container mx-auto px-4 text-center relative z-10">
-            <div className="inline-block px-3 py-1 bg-pink-600/30 rounded-full text-pink-800 font-medium text-sm mb-6 border border-pink-400/50 backdrop-blur-sm">
+            <div className="inline-block px-3 py-1  bg-blue-600/60 rounded-full text-white font-medium text-sm mb-6  backdrop-blur-sm">
               <span className="flex items-center">
                 <Sparkles className="h-4 w-4 mr-2" />
                 Comece Hoje Mesmo
