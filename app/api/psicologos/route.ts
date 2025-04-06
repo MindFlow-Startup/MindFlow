@@ -20,50 +20,58 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    try {
-        const dados = await request.json();
+  try {
+    const dados = await request.json();
 
-        function formatCRP(input: string): string {
-            const estadosMap: Record<string, string> = {
-                "01": "SP",
-                "02": "RJ",
-                "03": "MG",
-                "04": "RS",
-                "05": "PR",
-                "06": "DF",
-                "07": "BA",
-                "08": "PE",
-                "09": "GO",
-                "10": "PB",
-            };
+    // 👉 Formata o CRP pegando os dois primeiros dígitos como estado
+    function formatCRP(input: string): string {
+      const estadosMap: Record<string, string> = {
+        "01": "SP",
+        "02": "RJ",
+        "03": "MG",
+        "04": "RS",
+        "05": "PR",
+        "06": "DF",
+        "07": "BA",
+        "08": "PE",
+        "09": "GO",
+        "10": "PB",
+      };
 
-            const [codigo, numero] = input.split("/");
-            const estado = estadosMap[codigo] || "XX";
-            return `${numero}-${estado}`;
-        }
+      const limpo = input.replace("/", "").replace("-", "").trim(); // limpa barras e traços
+      const codigo = limpo.slice(0, 2); // primeiros dois dígitos
+      const numero = limpo.slice(2); // o resto é o número
+      const estado = estadosMap[codigo] || "XX";
 
-        const crpFormatado = formatCRP(dados.crp);
-
-        const novo = {
-            ...dados,
-            crp: crpFormatado,
-        };
-
-        return new Response(JSON.stringify(novo), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-    } catch (error) {
-        console.error("Erro ao processar requisição POST:", error);
-
-        return new Response(
-            JSON.stringify({ error: "Erro interno ao processar requisição" }),
-            { status: 500 }
-        );
+      return `${numero}-${estado}`;
     }
+
+    const crpFormatado = formatCRP(dados.crp);
+
+    const novo = {
+      ...dados,
+      crp: crpFormatado,
+    };
+
+    // 👉 (Opcional) salvar no banco:
+    // const psicologoCriado = await prisma.psicologo.create({ data: novo });
+
+    return new Response(JSON.stringify(novo), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao processar requisição POST:", error);
+
+    return new Response(
+      JSON.stringify({ error: "Erro interno ao processar requisição" }),
+      { status: 500 }
+    );
+  }
 }
+
   
 
 
