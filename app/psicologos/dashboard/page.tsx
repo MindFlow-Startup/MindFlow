@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/ui/app-sidebar"
 import {
   Breadcrumb,
@@ -12,6 +14,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, Clock, FileText, Users, TrendingUp, BrainCircuit, CheckCircle2, AlertCircle } from "lucide-react"
+import { use } from "react"
 
 export default function Page() {
   // Sample data for the dashboard
