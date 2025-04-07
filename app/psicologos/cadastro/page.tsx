@@ -1,314 +1,300 @@
 "use client"
 
-import type React from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { FiUser, FiMail, FiCalendar, FiAward, FiFileText, FiChevronDown, FiCheck } from "react-icons/fi"
+import { toast } from "react-hot-toast"
 
-import { useState, useEffect } from "react"; // Adicione useEffect
-import { useRouter } from "next/navigation";
-import { FiUser, FiMail, FiCalendar, FiAward, FiFileText, FiChevronDown, FiCheck } from "react-icons/fi";
-
-const ESPECIALIDADES_OPCOES = [
-  "Psicologia Clínica",
-  "Psicologia Organizacional",
-  "Neuropsicologia",
-  "Psicologia Escolar",
-  "Psicologia Social",
-  "Psicologia do Esporte",
-  "Psicologia Jurídica",
-  "Psicologia Hospitalar",
-  "Psicologia do Trânsito",
-  "Psicologia Forense",
-  "Outros",
+const SPECIALTIES_OPTIONS = [
+  "Ansiedade",
+  "Depressão",
+  "Transtornos alimentares",
+  "Estresse pós-traumático",
+  "Terapia de casal",
+  "Terapia infantil",
+  "Orientação profissional",
+  "Dependência química",
+  "Distúrbios do sono",
+  "Autoestima"
 ]
 
-export default function CadastroPsicologo() {
-  const router = useRouter();
+export default function PsychologistRegistration() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     crp: "",
     email: "",
     nomeCompleto: "",
     dataNascimento: "",
     especialidades: [] as string[],
-  });
+  })
 
-
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showEspecialidades, setShowEspecialidades] = useState(false)
+  const [showSpecialties, setShowSpecialties] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const toggleSpecialty = (specialty: string) => {
+    setFormData(prev => ({
       ...prev,
-      [name]: value,
+      especialidades: prev.especialidades.includes(specialty)
+        ? prev.especialidades.filter(s => s !== specialty)
+        : [...prev.especialidades, specialty]
     }))
   }
 
-  const toggleEspecialidade = (especialidade: string) => {
-    setFormData((prev) => {
-      const especialidades = prev.especialidades.includes(especialidade)
-        ? prev.especialidades.filter((esp) => esp !== especialidade)
-        : [...prev.especialidades, especialidade]
-
-      return {
-        ...prev,
-        especialidades,
-      }
-    })
+  const validateForm = () => {
+    if (!formData.crp) {
+      toast.error("CRP é obrigatório")
+      return false
+    }
+    if (!formData.email) {
+      toast.error("E-mail é obrigatório")
+      return false
+    }
+    if (!formData.nomeCompleto) {
+      toast.error("Nome completo é obrigatório")
+      return false
+    }
+    if (!formData.dataNascimento) {
+      toast.error("Data de nascimento é obrigatória")
+      return false
+    }
+    if (formData.especialidades.length === 0) {
+      toast.error("Selecione pelo menos uma especialidade")
+      return false
+    }
+    return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    // Validação básica do frontend
-    if (!formData.dataNascimento) {
-      setError("Preencha a data de nascimento")
-      return
-    }
+    
+    if (!validateForm()) return
 
     setIsSubmitting(true)
-    setError("")
 
     try {
-      const response = await fetch("/api/psicologos", {
+      const response = await fetch("/api/cadastro", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          dataNascimento: formData.dataNascimento, // Já está no formato YYYY-MM-DD
-        }),
+        body: JSON.stringify(formData),
       })
 
-      if (!response.ok) throw new Error("Erro no cadastro")
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Erro no cadastro")
+      }
 
-      setSuccess(true)
-      setTimeout(() => {
-        router.push("/cadastro/sucesso")
-      }, 2000)
+      const data = await response.json()
+      toast.success("Cadastro realizado com sucesso!")
+      router.push(`/confirmacao?email=${encodeURIComponent(data.email)}`)
     } catch (error) {
-      console.error(error)
-      setError("Erro ao cadastrar")
+      toast.error(error instanceof Error ? error.message : "Erro desconhecido")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  // Close dropdown when clicking outside
-  const handleClickOutside = (event: MouseEvent) => {
-    const target = event.target as Node
-    const dropdown = document.getElementById("especialidades-dropdown")
-    if (dropdown && !dropdown.contains(target)) {
-      setShowEspecialidades(false)
-    }
-  }
-
-  // Add event listener when component mounts
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      const dropdown = document.getElementById("especialidades-dropdown");
+      const target = event.target as Node
+      const dropdown = document.getElementById("specialties-dropdown")
       if (dropdown && !dropdown.contains(target)) {
-        setShowEspecialidades(false);
+        setShowSpecialties(false)
       }
-    };
+    }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-5xl flex rounded-2xl overflow-hidden shadow-xl">
-        {/* Left sidebar with gradient */}
-        <div className="bg-gradient-to-b from-purple-500 to-indigo-600 w-2/5 p-8 text-white flex flex-col justify-center">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="font-bold text-2xl">5</span>
-              <div className="text-xs">
-                <div className="font-semibold">Specialist</div>
-                <div className="opacity-80">Find The Perfect Mentor Online</div>
-              </div>
-            </div>
-          </div>
-          <h2 className="text-3xl font-bold mb-4">Learn From Worlds Best Instructors</h2>
-          <h3 className="text-2xl font-bold mb-8">Around The World.</h3>
-
-          <div className="relative h-40">{/* Decorative elements could be added here */}</div>
-        </div>
-
-        {/* Right form area */}
-        <div className="bg-white w-3/5 p-8">
-          <div className="max-w-md mx-auto">
-            <div className="text-right mb-6">
-              <select className="text-sm border-none bg-transparent">
-                <option>English (USA)</option>
-              </select>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">Cadastro de Psicólogo</h1>
+              <p className="mt-2 text-gray-600">
+                Preencha seus dados para se cadastrar em nossa plataforma
+              </p>
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Cadastro de Psicólogo</h1>
-
-            {success && (
-              <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-lg border border-green-200 flex items-center">
-                <FiFileText className="mr-2" />
-                <span>Cadastro realizado com sucesso!</span>
-              </div>
-            )}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 flex items-center">
-                <FiFileText className="mr-2" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div className="mb-5">
-                <label className="block text-gray-700 mb-2 font-medium" htmlFor="crp">
-                  <FiAward className="inline mr-2 text-purple-500" />
-                  CRP
-                </label>
-                <input
-                  id="crp"
-                  name="crp"
-                  type="text"
-                  value={formData.crp}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none focus:ring-purple-200 focus:border-purple-500 border-gray-300"
-                  placeholder="Ex: 123456/SP"
-                  required
-                />
-              </div>
-
-              <div className="mb-5">
-                <label className="block text-gray-700 mb-2 font-medium" htmlFor="email">
-                  <FiMail className="inline mr-2 text-purple-500" />
-                  E-mail*
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none focus:ring-purple-200 focus:border-purple-500 border-gray-300"
-                  placeholder="seu@email.com"
-                  required
-                />
-              </div>
-
-              <div className="mb-5">
-                <label className="block text-gray-700 mb-2 font-medium" htmlFor="nomeCompleto">
-                  <FiUser className="inline mr-2 text-purple-500" />
-                  Nome Completo
-                </label>
-                <input
-                  id="nomeCompleto"
-                  name="nomeCompleto"
-                  type="text"
-                  value={formData.nomeCompleto}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none focus:ring-purple-200 focus:border-purple-500 border-gray-300"
-                  placeholder="Insira seu nome completo"
-                  required
-                />
-              </div>
-
-              <div className="mb-5">
-                <label className="block text-gray-700 mb-2 font-medium" htmlFor="dataNascimento">
-                  <FiCalendar className="inline mr-2 text-purple-500" />
-                  Data de Nascimento
-                </label>
-                <input
-                  id="dataNascimento"
-                  name="dataNascimento"
-                  type="date"
-                  value={formData.dataNascimento}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none focus:ring-purple-200 focus:border-purple-500 border-gray-300"
-                  max={new Date().toISOString().split("T")[0]}
-                  required
-                />
-              </div>
-
-              {/* Campo Especialidades */}
-              <div className="mb-6 relative">
-                <label className="block text-gray-700 mb-2 font-medium">
-                  <FiAward className="inline mr-2 text-purple-500" />
-                  Especialidades
-                </label>
-
-                <div
-                  id="especialidades-dropdown"
-                  className={`w-full p-3 border rounded-lg cursor-pointer flex justify-between items-center border-gray-300 ${showEspecialidades ? "ring-2 ring-purple-200 border-purple-500" : ""}`}
-                  onClick={() => setShowEspecialidades(!showEspecialidades)}
-                >
-                  <span className="truncate">
-                    {formData.especialidades.length > 0
-                      ? formData.especialidades.join(", ")
-                      : "Selecione as especialidades"}
-                  </span>
-                  <FiChevronDown
-                    className={`transition-transform duration-300 ${showEspecialidades ? "rotate-180" : ""}`}
-                  />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {/* CRP */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="crp" className="block text-sm font-medium text-gray-700">
+                    CRP*
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiAward className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      name="crp"
+                      id="crp"
+                      value={formData.crp}
+                      onChange={handleChange}
+                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
+                      placeholder="Ex: 12345/SP"
+                    />
+                  </div>
                 </div>
 
-                {showEspecialidades && (
-                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {ESPECIALIDADES_OPCOES.map((especialidade) => (
-                      <div
-                        key={especialidade}
-                        className={`p-3 hover:bg-purple-50 cursor-pointer flex items-center justify-between ${
-                          formData.especialidades.includes(especialidade) ? "bg-purple-50" : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleEspecialidade(especialidade)
-                        }}
-                      >
-                        <span>{especialidade}</span>
-                        {formData.especialidades.includes(especialidade) && <FiCheck className="text-purple-600" />}
-                      </div>
-                    ))}
+                {/* Email */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email*
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiMail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
+                      placeholder="seu@email.com"
+                    />
                   </div>
-                )}
+                </div>
+
+                {/* Nome Completo */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="nomeCompleto" className="block text-sm font-medium text-gray-700">
+                    Nome Completo*
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiUser className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      name="nomeCompleto"
+                      id="nomeCompleto"
+                      value={formData.nomeCompleto}
+                      onChange={handleChange}
+                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
+                      placeholder="Seu nome completo"
+                    />
+                  </div>
+                </div>
+
+                {/* Data de Nascimento */}
+                <div>
+                  <label htmlFor="dataNascimento" className="block text-sm font-medium text-gray-700">
+                    Data de Nascimento*
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiCalendar className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="date"
+                      name="dataNascimento"
+                      id="dataNascimento"
+                      value={formData.dataNascimento}
+                      onChange={handleChange}
+                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
+                      max={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+                </div>
+
+                {/* Especialidades */}
+                <div>
+                  <label htmlFor="especialidades" className="block text-sm font-medium text-gray-700">
+                    Especialidades*
+                  </label>
+                  <div className="mt-1 relative" id="specialties-dropdown">
+                    <button
+                      type="button"
+                      className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-3 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      onClick={() => setShowSpecialties(!showSpecialties)}
+                    >
+                      <span className="block truncate">
+                        {formData.especialidades.length > 0
+                          ? formData.especialidades.join(", ")
+                          : "Selecione as especialidades"}
+                      </span>
+                      <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        <FiChevronDown className="h-5 w-5 text-gray-400" />
+                      </span>
+                    </button>
+
+                    {showSpecialties && (
+                      <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                        {SPECIALTIES_OPTIONS.map((specialty) => (
+                          <div
+                            key={specialty}
+                            className={`cursor-default select-none relative py-2 pl-8 pr-4 ${
+                              formData.especialidades.includes(specialty)
+                                ? "bg-indigo-100 text-indigo-900"
+                                : "text-gray-900 hover:bg-indigo-50"
+                            }`}
+                            onClick={() => toggleSpecialty(specialty)}
+                          >
+                            <span className="block truncate">{specialty}</span>
+                            {formData.especialidades.includes(specialty) && (
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
+                                <FiCheck className="h-5 w-5" />
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition duration-200 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Cadastrando...
-                  </span>
-                ) : (
-                  "Cadastrar"
-                )}
-              </button>
+              <div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Cadastrando...
+                    </>
+                  ) : (
+                    "Cadastrar"
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -316,4 +302,3 @@ export default function CadastroPsicologo() {
     </div>
   )
 }
-
