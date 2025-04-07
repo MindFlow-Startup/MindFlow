@@ -1,3 +1,5 @@
+'use client'
+
 import type * as React from "react";
 import { Brain, Calendar, FileText, Search, Video, BookOpen, Shield } from "lucide-react";
 
