@@ -18,7 +18,7 @@ model Psicologo {
   crp             String   @unique
   email           String   @unique
   nomeCompleto    String
-  dataNascimento  DateTime
+  dataNascimento  String 
   especialidades  String   
 
   @@map("psicologos")
