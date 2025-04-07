@@ -19,6 +19,5 @@ model Psicologo {
   email           String   @unique
   nomeCompleto    String
   dataNascimento  DateTime
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  especialidades  String[] // Add this field as an array of strings
 }

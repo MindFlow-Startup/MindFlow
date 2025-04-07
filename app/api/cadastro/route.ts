@@ -1,4 +1,3 @@
-// app/api/cadastro/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -9,13 +8,23 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { crp, email, nomeCompleto, dataNascimento, especialidades } = body;
 
+    // Validação básica
+    if (!Array.isArray(especialidades)) {
+      return NextResponse.json(
+        { message: "Especialidades deve ser um array" },
+        { status: 400 }
+      );
+    }
+
     const psicologo = await prisma.psicologo.create({
       data: {
         crp,
         email,
         nomeCompleto,
         dataNascimento: new Date(dataNascimento),
-        especialidades,
+        especialidades: {
+          set: especialidades,
+        },
       },
     });
 
