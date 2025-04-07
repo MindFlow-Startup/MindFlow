@@ -194,7 +194,7 @@ export default function CadastroPsicologo() {
           </p>
 
           <div className="flex flex-col space-y-3">
-            <Link href="/dashboard" className="w-full">
+            <Link href="psicologos/dashboard" className="w-full">
               <button className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-medium rounded-lg transition duration-200">
                 Acessar Minha Conta
               </button>
