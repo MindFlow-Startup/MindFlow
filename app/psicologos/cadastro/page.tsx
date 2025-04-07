@@ -2,9 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { FiUser, FiMail, FiCalendar, FiAward, FiFileText, FiChevronDown, FiCheck } from "react-icons/fi"
+import { useState, useEffect } from "react"; // Adicione useEffect
+import { useRouter } from "next/navigation";
+import { FiUser, FiMail, FiCalendar, FiAward, FiFileText, FiChevronDown, FiCheck } from "react-icons/fi";
 
 const ESPECIALIDADES_OPCOES = [
   "Psicologia Clínica",
@@ -21,14 +21,15 @@ const ESPECIALIDADES_OPCOES = [
 ]
 
 export default function CadastroPsicologo() {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState({
     crp: "",
     email: "",
     nomeCompleto: "",
     dataNascimento: "",
     especialidades: [] as string[],
-  })
+  });
+
 
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
@@ -104,13 +105,20 @@ export default function CadastroPsicologo() {
   }
 
   // Add event listener when component mounts
-  useState(() => {
-    document.addEventListener("mousedown", handleClickOutside)
-    // Clean up the event listener
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const dropdown = document.getElementById("especialidades-dropdown");
+      if (dropdown && !dropdown.contains(target)) {
+        setShowEspecialidades(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, )
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
