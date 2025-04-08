@@ -193,7 +193,7 @@ export default function Home() {
                 psicólogos.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="psicologos/cadastro">
+                <Link href="psicologos/login">
                   <button className="bg-gradient-to-r from-blue-400 to-pink-400 hover:from-blue-600 hover:to-pink-500 text-white font-bold py-3.5 px-8 rounded-full text-lg transition-all duration-300 hover:shadow-lg hover:shadow-pink-400/30 transform hover:-translate-y-1 flex items-center justify-center group">
                     Comece Agora
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
