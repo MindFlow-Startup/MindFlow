@@ -6,8 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "vercel-build": "npx prisma migrate deploy"  },
+    "lint": "next lint"
+   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.5.0",
