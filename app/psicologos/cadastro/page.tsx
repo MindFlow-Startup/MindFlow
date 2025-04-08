@@ -8,16 +8,36 @@ import {
   Brain,
   Heart,
   Shield,
-  Link,
   CheckCircle,
   Briefcase,
   User,
   Sparkles,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import Logo from "@/components/images/Logo1.png";
 
-// Lista de especialidades disponíveis
+// Tipos
+type FormData = {
+  crp: string;
+  email: string;
+  nomeCompleto: string;
+  dataNascimento: string;
+  especialidades: string[];
+};
+
+type StepProps = {
+  currentStep: number;
+  formData: FormData;
+  error: string;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleEspecialidadesChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  isSubmitting: boolean;
+};
+
+// Constantes
 const ESPECIALIDADES = [
   "Psicologia Clínica",
   "Psicologia Organizacional",
@@ -32,13 +52,14 @@ const ESPECIALIDADES = [
 ];
 
 export default function CadastroPsicologo() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     crp: "",
     email: "",
     nomeCompleto: "",
     dataNascimento: "",
-    especialidades: [] as string[],
+    especialidades: [],
   });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -74,17 +95,40 @@ export default function CadastroPsicologo() {
     });
   };
 
+  const validateStep1 = (): boolean => {
+    if (!formData.nomeCompleto.trim()) {
+      setError("Nome completo é obrigatório");
+      return false;
+    }
+    if (!formData.email.trim()) {
+      setError("E-mail é obrigatório");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError("Por favor, insira um e-mail válido");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = (): boolean => {
+    if (!formData.crp.trim()) {
+      setError("CRP é obrigatório");
+      return false;
+    }
+    if (!/^\d{2}\/\d{5}$/.test(formData.crp)) {
+      setError("Formato do CRP inválido (use 00/00000)");
+      return false;
+    }
+    return true;
+  };
+
   const nextStep = () => {
-    // Validação básica antes de avançar
-    if (currentStep === 1 && (!formData.nomeCompleto || !formData.email)) {
-      setError("Preencha todos os campos obrigatórios");
-      return;
-    }
-    if (currentStep === 2 && !formData.crp) {
-      setError("O CRP é obrigatório");
-      return;
-    }
     setError("");
+    
+    if (currentStep === 1 && !validateStep1()) return;
+    if (currentStep === 2 && !validateStep2()) return;
+    
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -97,7 +141,6 @@ export default function CadastroPsicologo() {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
-    setSuccess(false);
 
     // Validação final
     if (formData.especialidades.length === 0) {
@@ -114,31 +157,24 @@ export default function CadastroPsicologo() {
         },
         body: JSON.stringify({
           ...formData,
-          dataNascimento: new Date(formData.dataNascimento).toISOString(),
+          dataNascimento: formData.dataNascimento 
+            ? new Date(formData.dataNascimento).toISOString() 
+            : null,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Erro ao cadastrar psicólogo");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao cadastrar psicólogo");
       }
 
       const data = await response.json();
       setRegisteredId(data.id);
       setSuccess(true);
-
-      // Limpa o formulário após o sucesso
-      setFormData({
-        crp: "",
-        email: "",
-        nomeCompleto: "",
-        dataNascimento: "",
-        especialidades: [],
-      });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Ocorreu um erro desconhecido"
       );
-      console.error("Erro no cadastro:", err);
     } finally {
       setIsSubmitting(false);
     }

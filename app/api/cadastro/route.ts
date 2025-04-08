@@ -22,7 +22,7 @@ export async function POST(request: Request) {
         email,
         nomeCompleto,
         dataNascimento: new Date(dataNascimento),
-        especialidades: especialidades.join(','),
+        especialidades: especialidades,
       },
     });
 
