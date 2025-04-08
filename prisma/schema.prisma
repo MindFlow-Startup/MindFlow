@@ -19,5 +19,5 @@ model Psicologo {
   email           String   @unique
   nomeCompleto    String
   dataNascimento  DateTime
-  especialidades  String[] // Add this field as an array of strings
+  especialidades  String// Add this field as an array of strings
 }
